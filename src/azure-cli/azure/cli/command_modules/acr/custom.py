@@ -56,7 +56,9 @@ def acr_create(cmd,
                zone_redundancy=None,
                allow_trusted_services=None,
                allow_exports=None,
-               tags=None):
+               tags=None,
+               metadata_search=None
+               ):
 
     if default_action and sku not in get_premium_sku(cmd):
         raise CLIError(NETWORK_RULE_NOT_SUPPORTED)
@@ -69,7 +71,7 @@ def acr_create(cmd,
 
     Registry, Sku, NetworkRuleSet = cmd.get_models('Registry', 'Sku', 'NetworkRuleSet')
     registry = Registry(location=location, sku=Sku(name=sku), admin_user_enabled=admin_enabled,
-                        zone_redundancy=zone_redundancy, tags=tags)
+                        zone_redundancy=zone_redundancy, tags=tags, metadata_search=metadata_search)
     if default_action:
         registry.network_rule_set = NetworkRuleSet(default_action=default_action)
 
@@ -122,7 +124,8 @@ def acr_update_custom(cmd,
                       allow_trusted_services=None,
                       anonymous_pull_enabled=None,
                       allow_exports=None,
-                      tags=None):
+                      tags=None,
+                      metadata_search=None):
     if sku is not None:
         Sku = cmd.get_models('Sku')
         instance.sku = Sku(name=sku)
@@ -135,6 +138,9 @@ def acr_update_custom(cmd,
 
     if data_endpoint_enabled is not None:
         instance.data_endpoint_enabled = data_endpoint_enabled
+
+    if metadata_search is not None:
+        instance.metadata_search = metadata_search
 
     if public_network_enabled is not None:
         _configure_public_network_access(cmd, instance, public_network_enabled)
